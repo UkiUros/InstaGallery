@@ -1,8 +1,9 @@
 package com.incode.instagallery.di
 
+import com.incode.instagallery.domain.FeedMapper
 import com.incode.instagallery.networking.FeedService
-import com.incode.instagallery.networking.NetworkMapper
 import com.incode.instagallery.repository.FeedRepository
+import com.incode.instagallery.room.FeedDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,8 +18,9 @@ object RepositoryModule {
     @Provides
     fun provideArticleRepository(
         service: FeedService,
-        networkMapper: NetworkMapper
+        feedMapper: FeedMapper,
+        feedDao: FeedDao
     ): FeedRepository {
-        return FeedRepository(service, networkMapper)
+        return FeedRepository(service, feedDao, feedMapper)
     }
 }

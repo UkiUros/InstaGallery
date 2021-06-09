@@ -23,15 +23,41 @@ constructor(
     val feedDataState: LiveData<DataState<List<Feed>>>
         get() = mutableFeedDataState
 
+    val saveFeedPhotoDataState: LiveData<DataState<Boolean>>
+        get() = mutableSaveFeedPhotoDataState
+
+
     private val mutableFeedDataState: MutableLiveData<DataState<List<Feed>>> =
         MutableLiveData()
 
+    private val mutableSaveFeedPhotoDataState: MutableLiveData<DataState<Boolean>> =
+        MutableLiveData()
+
     @ExperimentalCoroutinesApi
-    fun loadFeeds() {
+    fun loadFeeds(forceFetch: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            feedRepository.getFeeds()
+            if (forceFetch) {
+                feedRepository.getFeeds()
+                    .onEach { dataState ->
+                        mutableFeedDataState.postValue(dataState)
+                    }
+                    .launchIn(this)
+            } else {
+                feedRepository.getLocalFeeds()
+                    .onEach { dataState ->
+                        mutableFeedDataState.postValue(dataState)
+                    }
+                    .launchIn(this)
+            }
+
+        }
+    }
+
+    fun addLocalPhoto(path: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            feedRepository.saveLocalPhoto(path)
                 .onEach { dataState ->
-                    mutableFeedDataState.postValue(dataState)
+                    mutableSaveFeedPhotoDataState.postValue(dataState)
                 }
                 .launchIn(this)
         }

@@ -1,6 +1,8 @@
 package com.incode.instagallery.ui.home
 
+import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -37,15 +39,24 @@ class FeedAdapter : ListAdapter<Feed, FeedAdapter.FeedViewHolder>(FeedDiffCallba
         holder.binding.textViewTitle.text = item.title
         holder.binding.textViewDescription.text = item.comment
 
-        if (item.pictureUrl != null) {
-            Glide.with(holder.itemView.context)
-                .load(item.pictureUrl)
-                .centerCrop()
-//                .apply(RequestOptions.skipMemoryCacheOf(true))
-                .apply(RequestOptions.signatureOf(ObjectKey(item.publishedAt!!)))
-                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
-                .into(holder.binding.imageViewPhoto)
+        holder.binding.textViewTitle.visibility =
+            if (item.title.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.binding.textViewDescription.visibility =
+            if (item.comment.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+        val uriToLoad = if (item.isFromNetwork) {
+            Uri.parse(item.pictureUri)
+        } else {
+            Uri.parse(item.pictureUri).path
         }
+
+        Glide.with(holder.itemView.context)
+            .load(uriToLoad)
+            .centerCrop()
+//                .apply(RequestOptions.skipMemoryCacheOf(true))
+            .apply(RequestOptions.signatureOf(ObjectKey(item.publishedAt!!)))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
+            .into(holder.binding.imageViewPhoto)
 
 
         holder.itemView.setOnClickListener {

@@ -2,9 +2,11 @@ package com.incode.instagallery.ui.details
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -37,15 +39,23 @@ class DetailsActivity : AppCompatActivity() {
         binding.textViewTitle.text = feed.title
         binding.textViewDescription.text = feed.comment
 
-        if (feed.pictureUrl != null) {
-            Glide.with(this)
-                .load(feed.pictureUrl)
-                .fitCenter()
-//                .apply(RequestOptions.skipMemoryCacheOf(true))
-                .apply(RequestOptions.signatureOf(ObjectKey(feed.publishedAt!!)))
-                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
-                .into(binding.imageViewPhoto)
+        if (feed.title.isNullOrEmpty() && feed.comment.isNullOrEmpty()) {
+            binding.textContainer.visibility = View.GONE
         }
+
+        val uriToLoad = if (feed.isFromNetwork) {
+            Uri.parse(feed.pictureUri)
+        } else {
+            Uri.parse(feed.pictureUri).path
+        }
+
+        Glide.with(this)
+            .load(uriToLoad)
+            .fitCenter()
+//                .apply(RequestOptions.skipMemoryCacheOf(true))
+            .apply(RequestOptions.signatureOf(ObjectKey(feed.publishedAt!!)))
+            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
+            .into(binding.imageViewPhoto)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
