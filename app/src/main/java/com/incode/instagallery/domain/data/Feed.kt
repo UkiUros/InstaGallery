@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Feed(
-    var id: String? = "",
+    var id: String = "",
     var title: String? = "",
     var comment: String? = "",
     var pictureUri: String = "",
