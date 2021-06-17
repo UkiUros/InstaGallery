@@ -52,8 +52,7 @@ class DetailsActivity : AppCompatActivity() {
         Glide.with(this)
             .load(uriToLoad)
             .fitCenter()
-//                .apply(RequestOptions.skipMemoryCacheOf(true))
-            .apply(RequestOptions.signatureOf(ObjectKey(feed.publishedAt!!)))
+            .apply(RequestOptions.signatureOf(ObjectKey(feed.id)))
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
             .into(binding.imageViewPhoto)
     }

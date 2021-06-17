@@ -53,8 +53,7 @@ class FeedAdapter : ListAdapter<Feed, FeedAdapter.FeedViewHolder>(FeedDiffCallba
         Glide.with(holder.itemView.context)
             .load(uriToLoad)
             .centerCrop()
-//                .apply(RequestOptions.skipMemoryCacheOf(true))
-            .apply(RequestOptions.signatureOf(ObjectKey(item.publishedAt!!)))
+            .apply(RequestOptions.signatureOf(ObjectKey(item.id)))
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
             .into(holder.binding.imageViewPhoto)
 
