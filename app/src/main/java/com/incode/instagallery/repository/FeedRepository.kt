@@ -37,8 +37,6 @@ class FeedRepository constructor(
         val cachedFeeds = feedDao.getFeeds()
         emit(DataState.Success(feedMapper.mapFromCacheEntityList(cachedFeeds)))
 
-    }.catch {
-        emit(DataState.Error(it))
     }
 
     @ExperimentalCoroutinesApi

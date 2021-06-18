@@ -7,9 +7,11 @@ import com.incode.instagallery.repository.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,8 +42,10 @@ constructor(
                 feedRepository.getFeeds()
                     .onEach { dataState ->
                         mutableFeedDataState.postValue(dataState)
-                    }
-                    .launchIn(this)
+                    }.catch {
+                        Timber.e(it)
+                        loadFeeds(false) // fallback: load from DB
+                    }.launchIn(this)
             } else {
                 feedRepository.getLocalFeeds()
                     .onEach { dataState ->
