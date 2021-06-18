@@ -1,5 +1,6 @@
 package com.incode.instagallery.repository
 
+import android.net.Uri
 import com.incode.instagallery.domain.DataState
 import com.incode.instagallery.domain.FeedMapper
 import com.incode.instagallery.domain.data.Feed
@@ -16,6 +17,12 @@ class FeedRepository constructor(
     private val feedDao: FeedDao,
     private val feedMapper: FeedMapper
 ) {
+
+    @ExperimentalCoroutinesApi
+    suspend fun getFeedForId(id: String): Flow<Feed?> = flow {
+        val cachedFeeds = feedDao.getFeed(id)
+        emit(feedMapper.mapFromCacheEntity(cachedFeeds))
+    }
 
     @ExperimentalCoroutinesApi
     suspend fun getFeeds(): Flow<DataState<List<Feed>>> = flow {
@@ -45,8 +52,10 @@ class FeedRepository constructor(
         emit(DataState.Error(it))
     }
 
-    suspend fun saveLocalPhoto(path: String): Flow<DataState<Boolean>> = flow {
+    suspend fun saveLocalPhoto(uriString: String): Flow<DataState<Boolean>> = flow {
         emit(DataState.Loading)
+
+        val path = Uri.parse(uriString).path ?: throw IllegalArgumentException("Invalid URI path")
 
         val currentMs = System.currentTimeMillis()
         val cacheEntity = FeedCacheEntity(

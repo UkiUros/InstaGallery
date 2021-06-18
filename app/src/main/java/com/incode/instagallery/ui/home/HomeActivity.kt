@@ -56,7 +56,7 @@ class HomeActivity : AppCompatActivity() {
         binding.recyclerView.adapter = adapter
         adapter.onItemClickListener = object : FeedAdapter.OnItemClickListener {
             override fun onItemClicked(feed: Feed) {
-                DetailsActivity.start(this@HomeActivity, feed)
+                DetailsActivity.start(this@HomeActivity, feed.id)
             }
         }
 
@@ -154,6 +154,5 @@ class HomeActivity : AppCompatActivity() {
         }
 
     }
-
 
 }

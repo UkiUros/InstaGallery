@@ -11,7 +11,6 @@ class FeedMapper
 @Inject
 constructor() {
 
-
     fun mapFromCacheEntityList(entities: List<FeedCacheEntity>): List<Feed> {
         return entities.map { mapFromCacheEntity(it) }
     }
@@ -20,7 +19,7 @@ constructor() {
         return networkEntities.map { mapToCacheEntity(it) }
     }
 
-    private fun mapFromCacheEntity(entity: FeedCacheEntity): Feed {
+    fun mapFromCacheEntity(entity: FeedCacheEntity): Feed {
         return Feed(
             id = entity.id,
             title = entity.title,
