@@ -4,13 +4,10 @@ import androidx.lifecycle.*
 import com.incode.instagallery.domain.data.Feed
 import com.incode.instagallery.repository.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +26,7 @@ constructor(
 
     @ExperimentalCoroutinesApi
     fun loadFeed(feedId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             feedRepository.getFeedForId(feedId)
                 .onEach { dataState ->
                     mutableFeedLiveData.postValue(dataState)

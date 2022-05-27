@@ -5,7 +5,6 @@ import com.incode.instagallery.domain.DataState
 import com.incode.instagallery.domain.data.Feed
 import com.incode.instagallery.repository.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -37,7 +36,7 @@ constructor(
 
     @ExperimentalCoroutinesApi
     fun loadFeeds(forceFetch: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (forceFetch) {
                 feedRepository.getFeeds()
                     .onEach { dataState ->
@@ -58,7 +57,7 @@ constructor(
     }
 
     fun addLocalPhoto(path: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             feedRepository.saveLocalPhoto(path)
                 .onEach { dataState ->
                     mutableSaveFeedPhotoDataState.postValue(dataState)

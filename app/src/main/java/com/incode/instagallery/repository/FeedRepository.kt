@@ -7,22 +7,30 @@ import com.incode.instagallery.domain.data.Feed
 import com.incode.instagallery.networking.FeedService
 import com.incode.instagallery.room.FeedCacheEntity
 import com.incode.instagallery.room.FeedDao
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 
 class FeedRepository constructor(
     private val feedService: FeedService,
     private val feedDao: FeedDao,
-    private val feedMapper: FeedMapper
+    private val feedMapper: FeedMapper,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     @ExperimentalCoroutinesApi
     suspend fun getFeedForId(id: String): Flow<Feed?> = flow {
         val cachedFeeds = feedDao.getFeed(id)
         emit(feedMapper.mapFromCacheEntity(cachedFeeds))
-    }
+    }.flowOn(ioDispatcher)
+        .catch {
+            Timber.e(it)
+        }
 
     @ExperimentalCoroutinesApi
     suspend fun getFeeds(): Flow<DataState<List<Feed>>> = flow {
@@ -37,7 +45,7 @@ class FeedRepository constructor(
         val cachedFeeds = feedDao.getFeeds()
         emit(DataState.Success(feedMapper.mapFromCacheEntityList(cachedFeeds)))
 
-    }
+    }.flowOn(ioDispatcher)
 
     @ExperimentalCoroutinesApi
     suspend fun getLocalFeeds(): Flow<DataState<List<Feed>>> = flow {
@@ -46,9 +54,10 @@ class FeedRepository constructor(
         val cachedFeeds = feedDao.getFeeds()
         emit(DataState.Success(feedMapper.mapFromCacheEntityList(cachedFeeds)))
 
-    }.catch {
-        emit(DataState.Error(it))
-    }
+    }.flowOn(ioDispatcher)
+        .catch {
+            emit(DataState.Error(it))
+        }
 
     suspend fun saveLocalPhoto(uriString: String): Flow<DataState<Boolean>> = flow {
         emit(DataState.Loading)
@@ -66,7 +75,8 @@ class FeedRepository constructor(
 
         emit(DataState.Success(result > -1))
 
-    }.catch {
+    }.flowOn(ioDispatcher)
+        .catch {
         emit(DataState.Error(it))
     }
 }
